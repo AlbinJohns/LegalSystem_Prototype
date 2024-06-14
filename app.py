@@ -7,7 +7,7 @@ import torch
 import google.generativeai as genai
 
 # Configure API key and model
-genai.configure(api_key= GEMINI_API)  # Replace with your actual API key
+genai.configure(api_key= 'AIzaSyCUvxW0CQ7auPgWb9hwiZonYNy2kuiF63A')  # Replace with your actual API key
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 # Initialize the sentence transformer model
