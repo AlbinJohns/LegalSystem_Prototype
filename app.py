@@ -1,3 +1,4 @@
+%%writefile app.py
 # -*- coding: utf-8 -*-
 import streamlit as st
 import pickle
@@ -7,7 +8,7 @@ import torch
 import google.generativeai as genai
 
 # Configure API key and model
-genai.configure(api_key= 'AIzaSyCUvxW0CQ7auPgWb9hwiZonYNy2kuiF63A')  # Replace with your actual API key
+genai.configure(api_key='AIzaSyCUvxW0CQ7auPgWb9hwiZonYNy2kuiF63A')  # Replace with your actual API key
 model = genai.GenerativeModel('gemini-1.5-flash')
 
 # Initialize the sentence transformer model
@@ -18,12 +19,16 @@ def load_case_env(case_id):
     try:
         with open(f"{case_id}_history.pkl", "rb") as f:
             history = pickle.load(f)
+        chat = model.start_chat(history=history)
     except FileNotFoundError:
         st.error(f"No history found for case {case_id}.")
         return None
-
-    chat = model.start_chat(history=history)
     return chat
+
+# Function to close case environment
+def close_case_env(case_id):
+    if f"chat_{case_id}" in st.session_state:
+        del st.session_state[f"chat_{case_id}"]
 
 # Function to send a query to the chat model
 def send_case_query(chat, query):
@@ -93,6 +98,8 @@ if st.session_state.search_query:
 if st.session_state.search_results:
     for i, (doc_id, content, score) in enumerate(st.session_state.search_results):
         if st.button(f"Select Case {doc_id} 📄", key=doc_id):
+            if st.session_state.case_id:
+                close_case_env(st.session_state.case_id)
             st.session_state.case_id = doc_id
             st.session_state.selected_content = content
             st.session_state.chat = load_case_env(doc_id)
