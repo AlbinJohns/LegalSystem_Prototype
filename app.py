@@ -1,4 +1,3 @@
-%%writefile app.py
 # -*- coding: utf-8 -*-
 import streamlit as st
 import pickle
