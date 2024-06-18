@@ -2,6 +2,7 @@
 import streamlit as st
 import pickle
 import textwrap
+import numpy as np
 from sentence_transformers import SentenceTransformer, util
 import torch
 import google.generativeai as genai
@@ -40,7 +41,8 @@ def query_documents(query, documents, model, top_k=3):
     query_embedding = model.encode(query)
 
     # Convert embeddings to tensor
-    document_embeddings = torch.tensor([doc['embedding'] for doc in documents])
+    embeddings_list = [doc['embedding'] for doc in documents]
+    document_embeddings = torch.tensor(np.array(embeddings_list))
 
     # Calculate cosine similarities
     cos_scores = util.pytorch_cos_sim(query_embedding, document_embeddings)
@@ -131,6 +133,6 @@ if st.session_state.case_id:
             with st.spinner("Looking Through..."):
                 response = send_case_query(st.session_state.chat, query)
                 st.session_state.history.append((query, response))
-                st.experimental_rerun()
+                st.rerun()
 else:
     st.warning("Please enter a query to search for cases.")
